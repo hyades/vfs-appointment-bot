@@ -8,10 +8,12 @@ from _ConfigReader import _ConfigReader
 from _TwilioClient import _TwilioClient
 from _TelegramClient import _TelegramClient
 
-
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
 from selenium.common.exceptions import NoSuchElementException
+
+from twocaptcha import TwoCaptcha
+
 
 class _VfsClient:
 
@@ -29,7 +31,7 @@ class _VfsClient:
         firefox_options = Options()
 
         # open in headless mode to run in background
-        firefox_options.headless = True
+        firefox_options.headless = False
         # firefox_options.add_argument("start-maximized")
 
         # following options reduce the RAM usage
@@ -39,14 +41,14 @@ class _VfsClient:
         firefox_options.add_argument("--disable-application-cache")
         firefox_options.add_argument("--disable-gpu")
         firefox_options.add_argument("--disable-dev-shm-usage")
-        self._web_driver = webdriver.Firefox(options=firefox_options)
+        self._web_driver = webdriver.Firefox(options=firefox_options,
+                                             executable_path="/Users/kennethyellow/Documents/yellow/vfs-appointment-bot/geckodriver")
 
         # make sure that the browser is full screen,
         # else some buttons will not be visible to selenium
         self._web_driver.maximize_window()
 
     def _login(self):
-
         _section_header = "VFS"
         _email = self._config_reader.read_prop(_section_header, "vfs_email");
         _password = self._config_reader.read_prop(_section_header, "vfs_password");
@@ -61,13 +63,25 @@ class _VfsClient:
         _email_input.send_keys(_email)
         _password_input = self._web_driver.find_element_by_xpath("//input[@id='mat-input-1']")
         _password_input.send_keys(_password)
-        _login_button = self._web_driver.find_element_by_xpath("//button/span")
+
+        # reCaptcha solver
+        solver = TwoCaptcha('9178c29c87c5b9bac9917779a69faa99')
+        result = solver.recaptcha(
+            sitekey='6LfDxboZAAAAAD6GHukjvUy6lszoeG3H4nQW57b6',
+            url='https://2captcha.com/demo/recaptcha-v2-invisible?level=low')
+        self._web_driver.execute_script("document.getElementById('g-recaptcha-response').innerHTML='"+result['code']+"';") # add response token
+
+        # log in
+        _login_button = self._web_driver.find_element_by_xpath(
+            "//html/body/app-root/div/app-login/section/div/div/mat-card/form/button/span[1]")
         _login_button.click()
         time.sleep(10)
 
+
     def _validate_login(self):
         try:
-            _new_booking_button = self._web_driver.find_element_by_xpath("//section/div/div[2]/button/span")
+            _new_booking_button = self._web_driver.find_element_by_xpath(
+                "//html/body/app-root/div/app-login/section/div/div/mat-card/form/button")
             if _new_booking_button == None:
                 logging.debug("Unable to login. VFS website is not responding")
                 raise Exception("Unable to login. VFS website is not responding")
@@ -78,10 +92,12 @@ class _VfsClient:
             raise Exception("Unable to login. VFS website is not responding")
 
     def _get_appointment_date(self, visa_centre, category, sub_category):
-        logging.info("Getting appointment date: Visa Centre: {}, Category: {}, Sub-Category: {}".format(visa_centre, category, sub_category))
+        logging.info(
+            "Getting appointment date: Visa Centre: {}, Category: {}, Sub-Category: {}".format(visa_centre, category,
+                                                                                               sub_category))
         # select from drop down
         _new_booking_button = self._web_driver.find_element_by_xpath(
-            "//section/div/div[2]/button/span"
+            "//html/body/app-root/div/app-dashboard/section[1]/div/div[2]/button/span[1]"
         )
         _new_booking_button.click()
         time.sleep(5)
@@ -90,6 +106,7 @@ class _VfsClient:
         )
         _visa_centre_dropdown.click()
         time.sleep(2)
+        options = _visa_centre_dropdown.find_elements_by_tag_name("mat-option")
 
         try:
             _visa_centre = self._web_driver.find_element_by_xpath(
