@@ -67,9 +67,10 @@ class _VfsClient:
         # reCaptcha solver
         solver = TwoCaptcha('9178c29c87c5b9bac9917779a69faa99')
         result = solver.recaptcha(
-            sitekey='6LfDxboZAAAAAD6GHukjvUy6lszoeG3H4nQW57b6',
-            url='https://2captcha.com/demo/recaptcha-v2-invisible?level=low')
+            sitekey='6LfDUY8bAAAAAPU5MWGT_w0x5M-8RdzC29SClOfI',
+            url='https://visa.vfsglobal.com/gbr/en/prt/login')
         self._web_driver.execute_script("document.getElementById('g-recaptcha-response').innerHTML='"+result['code']+"';") # add response token
+        time.sleep(20)
 
         # log in
         _login_button = self._web_driver.find_element_by_xpath(
