@@ -70,7 +70,16 @@ class _VfsClient:
             sitekey='6LfDUY8bAAAAAPU5MWGT_w0x5M-8RdzC29SClOfI',
             url='https://visa.vfsglobal.com/gbr/en/prt/login')
         self._web_driver.execute_script("document.getElementById('g-recaptcha-response').innerHTML='"+result['code']+"';") # add response token
-        time.sleep(20)
+
+        iframe = self._web_driver.find_element_by_xpath(
+            "/html/body/app-root/div/app-login/section/div/div/mat-card/form/app-captcha-container/div/div/div/iframe")
+        self._web_driver.switch_to.frame(iframe)
+        _recaptcha_verify = self._web_driver.find_element_by_xpath("//*[@id='rc-anchor-container']")
+        _recaptcha_verify.click()
+
+        self._web_driver.switch_to.default_content()
+        time.sleep(10)
+
 
         # log in
         _login_button = self._web_driver.find_element_by_xpath(
