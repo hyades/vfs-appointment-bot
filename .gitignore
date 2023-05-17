@@ -127,3 +127,6 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+*.ipynb
+*.2023-05-14_13
+*.2023-05-14_20
