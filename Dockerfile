@@ -12,6 +12,12 @@ RUN curl -L -o firefox.tar.bz2 https://download-installer.cdn.mozilla.net/pub/fi
     && ln -s /opt/firefox/firefox /usr/bin/firefox \
     && rm firefox.tar.bz2
 
+# Install geckodriver
+RUN curl -L -o geckodriver.tar.gz https://github.com/mozilla/geckodriver/releases/download/v0.30.0/geckodriver-v0.30.0-linux64.tar.gz \
+    && tar xzf geckodriver.tar.gz -C /usr/local/bin \
+    && rm geckodriver.tar.gz \
+    && chmod +x /usr/local/bin/geckodriver
+
 WORKDIR /app
 
 # Copy the requirements file separately and install dependencies
