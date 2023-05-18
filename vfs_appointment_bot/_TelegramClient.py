@@ -14,11 +14,11 @@ class _TelegramClient:
     def send_message(self, message):
         url = f"https://api.telegram.org/bot{self.bot_token}/sendMessage?chat_id={self.chat_id}&parse_mode={self.parse_mode}&text={message}"
 
-        logging.debug("Sending message")
+        print("Sending message")
         try:
             # sends message
             response_json = requests.get(url).json()
             logging.debug(str(response_json))
-            logging.debug("Message sent")
+            print("Message sent")
         except Exception as e:
             print("Some problem occured in sending message via telegram: {}".format(e))
