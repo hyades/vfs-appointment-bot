@@ -42,7 +42,7 @@ class _VfsClient:
         firefox_options.add_argument("--disable-gpu")
         firefox_options.add_argument("--disable-dev-shm-usage")
         self._web_driver = webdriver.Firefox(options=firefox_options,
-                                             executable_path="/Users/kennethyellow/Documents/yellow/vfs-appointment-bot/geckodriver")
+                                             executable_path="/app/geckodriver")
 
         # make sure that the browser is full screen,
         # else some buttons will not be visible to selenium
