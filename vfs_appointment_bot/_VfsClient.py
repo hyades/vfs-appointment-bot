@@ -64,24 +64,26 @@ class _VfsClient:
         _email_input.send_keys(_email)
         _password_input = self._web_driver.find_element("xpath", "//input[@id='mat-input-1']")
         _password_input.send_keys(_password)
-        time.sleep(10)
+        time.sleep(3)
         # reCaptcha solver
         _section_header = "2CAPTCHA"
         _api_key = self._config_reader.read_prop(_section_header, "api_key");
         _site_key = self._config_reader.read_prop(_section_header, "site_key");
         solver = TwoCaptcha(_api_key)
+        logging.debug("Balance: " + str(solver.balance()))
         result = solver.recaptcha(
             sitekey=_site_key,
             url=_page_url)
+
         self._web_driver.execute_script(f"___grecaptcha_cfg.clients['0']['Z']['Z']['callback']('{result['code']}')") # add response token
-        time.sleep(10)
+        time.sleep(15)
 
 
         # log in
         _login_button = self._web_driver.find_element("xpath",
             "//html/body/app-root/div/app-login/section/div/div/mat-card/form/button/span[1]")
         _login_button.click()
-        time.sleep(30)
+        time.sleep(20)
 
 
     def _validate_login(self):
@@ -108,7 +110,7 @@ class _VfsClient:
             "//mat-form-field/div/div/div[3]"
         )
         _visa_centre_dropdown.click()
-        time.sleep(20)
+        time.sleep(10)
 
         try:
             _visa_centre = self._web_driver.find_element("xpath",
@@ -119,7 +121,7 @@ class _VfsClient:
 
         logging.debug("VFS Centre: " + _visa_centre.text)
         self._web_driver.execute_script("arguments[0].click();", _visa_centre)
-        time.sleep(20)
+        time.sleep(10)
 
         _category_dropdown = self._web_driver.find_element("xpath",
             "//div[@id='mat-select-value-3']"
@@ -172,7 +174,7 @@ class _VfsClient:
         _message = self._get_appointment_date(visa_centre, category, sub_category)
         logging.debug("Message: " + _message.text)
 
-        if len(_message.text) != 0 and _message.text != "No appointment slots are currently available" and _message.text != "Currently No slots are available for selected category, please confirm waitlist\nTerms and Conditions":
+        if len(_message.text) != 0 and _message.text != "No appointment slots are currently available" and _message.text != "Currently No slots are available for selected category, please confirm waitlist\nTerms and Conditions" and "We are sorry" not in _message.text:
             logging.info("Appointment slots available: {}".format(_message.text))
             ts = time.time()
             st = datetime.datetime.fromtimestamp(ts).strftime("%Y-%m-%d %H:%M:%S")

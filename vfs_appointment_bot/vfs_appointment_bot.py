@@ -6,20 +6,6 @@ from _Timer import countdown
 from _ConfigReader import _ConfigReader
 from _VfsClient import _VfsClient
 
-def _input():
-    visa_centre = 'Netherlands Visa application centre - London'
-    category = 'Default Netherlands United Kingdom'
-    sub_category = 'Tourism'
-
-    logging.debug("Visa centre: {}, Category: {}, Sub-Category: {}".format(visa_centre, category, sub_category))
-
-    return visa_centre, category, sub_category
-
-def _read_command_line_args():
-    if len(sys.argv) != 4:
-        return _input()
-    return sys.argv[1], sys.argv[2], sys.argv[3]
-
 
 if __name__ == "__main__":
     count = 1
@@ -31,7 +17,9 @@ if __name__ == "__main__":
     _interval = _config_reader.read_prop("DEFAULT", "interval")
     logging.debug("Interval: {}".format(_interval))
 
-    visa_centre, category, sub_category = _read_command_line_args()
+    visa_centre = _config_reader.read_prop("VFS", "visa_centre")
+    category = _config_reader.read_prop("VFS", "visa_category")
+    sub_category = _config_reader.read_prop("VFS", "visa_subcategory")
 
     logging.info("Starting VFS Appointment Bot")
     while True:
@@ -41,7 +29,7 @@ if __name__ == "__main__":
             logging.debug("Sleeping for {} seconds".format(_interval))
             countdown(int(_interval))
         except Exception as e:
-            logging.info(e.args[0] + ". Please check the logs for more details")
+            logging.info("Please check the logs for more details")
             logging.debug(e, exc_info=True, stack_info=True)
             countdown(int(60))
             pass
