@@ -7,9 +7,9 @@ from _ConfigReader import _ConfigReader
 from _VfsClient import _VfsClient
 
 def _input():
-    visa_centre = 'Portugal Visa application Centre London'
-    category = 'Long Stay'
-    sub_category = 'National Visa'
+    visa_centre = 'Netherlands Visa application centre - London'
+    category = 'Default Netherlands United Kingdom'
+    sub_category = 'Tourism'
 
     logging.debug("Visa centre: {}, Category: {}, Sub-Category: {}".format(visa_centre, category, sub_category))
 

@@ -130,3 +130,6 @@ dmypy.json
 *.ipynb
 *.2023-05-14_13
 *.2023-05-14_20
+
+# app logs
+app.log*

@@ -31,8 +31,8 @@ class _VfsClient:
         firefox_options = Options()
 
         # open in headless mode to run in background
-        firefox_options.headless = True
-        # firefox_options.add_argument("start-maximized")
+        firefox_options.headless = False
+        firefox_options.add_argument("start-maximized")
 
         # following options reduce the RAM usage
         firefox_options.add_argument("disable-infobars")
@@ -42,7 +42,7 @@ class _VfsClient:
         firefox_options.add_argument("--disable-gpu")
         firefox_options.add_argument("--disable-dev-shm-usage")
         self._web_driver = webdriver.Firefox(options=firefox_options,
-                                             executable_path="/usr/local/bin/geckodriver")
+                                             executable_path="/Users/aayushahuja/Documents/github/gecko/geckodriver")
 
         # make sure that the browser is full screen,
         # else some buttons will not be visible to selenium
@@ -57,12 +57,12 @@ class _VfsClient:
         logging.debug("Logging in with email: {}".format(_email))
 
         # logging in
-        time.sleep(30)
+        time.sleep(15)
 
         # sleep provides sufficient time for all the elements to get visible
-        _email_input = self._web_driver.find_element_by_xpath("//input[@id='mat-input-0']")
+        _email_input = self._web_driver.find_element("xpath", "//input[@id='mat-input-0']")
         _email_input.send_keys(_email)
-        _password_input = self._web_driver.find_element_by_xpath("//input[@id='mat-input-1']")
+        _password_input = self._web_driver.find_element("xpath", "//input[@id='mat-input-1']")
         _password_input.send_keys(_password)
         time.sleep(10)
         # reCaptcha solver
@@ -73,12 +73,12 @@ class _VfsClient:
         result = solver.recaptcha(
             sitekey=_site_key,
             url=_page_url)
-        self._web_driver.execute_script(f"___grecaptcha_cfg.clients['0']['A']['A']['callback']('{result['code']}')") # add response token
+        self._web_driver.execute_script(f"___grecaptcha_cfg.clients['0']['Z']['Z']['callback']('{result['code']}')") # add response token
         time.sleep(10)
 
 
         # log in
-        _login_button = self._web_driver.find_element_by_xpath(
+        _login_button = self._web_driver.find_element("xpath",
             "//html/body/app-root/div/app-login/section/div/div/mat-card/form/button/span[1]")
         _login_button.click()
         time.sleep(30)
@@ -86,7 +86,7 @@ class _VfsClient:
 
     def _validate_login(self):
         try:
-            _new_booking_button = self._web_driver.find_element_by_xpath(
+            _new_booking_button = self._web_driver.find_element("xpath",
                 "//html/body/app-root/div/app-dashboard/section[1]/div/div[2]/button")
             if _new_booking_button == None:
                 logging.debug("Unable to login. VFS website is not responding")
@@ -104,14 +104,14 @@ class _VfsClient:
             "Getting appointment date: Visa Centre: {}, Category: {}, Sub-Category: {}".format(visa_centre, category,
                                                                                                sub_category))
         time.sleep(10)
-        _visa_centre_dropdown = self._web_driver.find_element_by_xpath(
+        _visa_centre_dropdown = self._web_driver.find_element("xpath",
             "//mat-form-field/div/div/div[3]"
         )
         _visa_centre_dropdown.click()
         time.sleep(20)
 
         try:
-            _visa_centre = self._web_driver.find_element_by_xpath(
+            _visa_centre = self._web_driver.find_element("xpath",
                 "//mat-option[starts-with(@id,'mat-option-')]/span[contains(text(), '{}')]".format(visa_centre)
             )
         except NoSuchElementException:
@@ -121,14 +121,14 @@ class _VfsClient:
         self._web_driver.execute_script("arguments[0].click();", _visa_centre)
         time.sleep(20)
 
-        _category_dropdown = self._web_driver.find_element_by_xpath(
+        _category_dropdown = self._web_driver.find_element("xpath",
             "//div[@id='mat-select-value-3']"
         )
         _category_dropdown.click()
-        time.sleep(20)
+        time.sleep(5)
 
         try:
-            _category = self._web_driver.find_element_by_xpath(
+            _category = self._web_driver.find_element("xpath",
                 "//mat-option[starts-with(@id,'mat-option-')]/span[contains(text(), '{}')]".format(category)
             )
         except NoSuchElementException:
@@ -136,17 +136,17 @@ class _VfsClient:
 
         logging.debug("Category: " + _category.text)
         self._web_driver.execute_script("arguments[0].click();", _category)
-        time.sleep(20)
+        time.sleep(5)
 
-        _subcategory_dropdown = self._web_driver.find_element_by_xpath(
+        _subcategory_dropdown = self._web_driver.find_element("xpath",
             "//div[@id='mat-select-value-5']"
         )
 
         self._web_driver.execute_script("arguments[0].click();", _subcategory_dropdown)
-        time.sleep(20)
+        time.sleep(5)
 
         try:
-            _subcategory = self._web_driver.find_element_by_xpath(
+            _subcategory = self._web_driver.find_element("xpath",
                 "//mat-option[starts-with(@id,'mat-option-')]/span[contains(text(), '{}')]".format(sub_category)
             )
         except NoSuchElementException:
@@ -157,7 +157,7 @@ class _VfsClient:
         time.sleep(20)
 
         # read contents of the text box
-        return self._web_driver.find_element_by_xpath("//div[4]/div")
+        return self._web_driver.find_element("xpath", "//div[4]/div")
 
     def check_slot(self, visa_centre, category, sub_category):
         self._init_web_driver()
